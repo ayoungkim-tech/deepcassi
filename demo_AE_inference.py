@@ -61,6 +61,7 @@ def test_infer_single(in_filename, out_filename_gt, out_filename,
     mat_obj = sio.loadmat(in_filename)
     img_hs = mat_obj['img_hs']
     img_hs = img_hs.astype(np.float32) / 65535.0
+    #img_hs = img_hs.astype(np.float32) # for KAIST scene 2, 21, 23, and testdata
     img_hs = np.expand_dims(img_hs, axis=0)
     data = img_hs
 
@@ -85,21 +86,21 @@ def test_infer_single(in_filename, out_filename_gt, out_filename,
         code_i = code[i]
 
         # visualize the feature map
-        vis.visualize_sparse_code(code, rows=8, cols=8, title='nonlinear representation', scale=0.25)
-        cv2.waitKey()
-        print('Press any keys to continue')
+        #vis.visualize_sparse_code(code, rows=8, cols=8, title='nonlinear representation', scale=0.25)
+        #cv2.waitKey()
+        #print('Press any keys to continue')
 
         # compare gt and recon
         img_h, img_w, img_chs = gt_i.shape
         scale = 5
-        recon_i_resize = cv2.resize(recon_i, dsize=(img_w / scale, img_h / scale))
+        recon_i_resize = cv2.resize(recon_i, dsize=(int(img_w / scale), int(img_h / scale)))
         recon_i_resize = np.expand_dims(recon_i_resize, 0)
-        gt_i_resize = cv2.resize(gt_i, dsize=(img_w / scale, img_h / scale))
+        gt_i_resize = cv2.resize(gt_i, dsize=(int(img_w / scale), int(img_h / scale)))
         gt_i_resize = np.expand_dims(gt_i_resize, 0)
         vis.draw_the_comparison(recon_i_resize, gt_i_resize, title='image inferred comparison',
                                 compute_psnr=True)
         cv2.waitKey()
-        print('Press any keys to continue')
+        #print('Press any keys to continue')
 
     #########################################################
     # save

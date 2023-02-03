@@ -38,6 +38,7 @@ Warranty: KAIST-VCLAB MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILI
 import numpy as np
 import cv2
 import assessment.quality as qual
+import matplotlib.pyplot as plt
 
 
 def normalize_1ch(img):
@@ -65,6 +66,8 @@ def imshow_with_zoom(wname='zoom',img=[], scale = 1.0, interpolation=cv2.INTER_C
         return
     img_zoom = cv2.resize(img, (0,0), fx=scale, fy=scale, interpolation=interpolation)
     cv2.imshow(wname, img_zoom)
+    ########### To solve figure is not responding ####################
+    cv2.waitKey(10)
 
 def visualize_sparse_code(code, rows=16, cols=16, padding=5, title='code', scale=0.25):
     # visualize the feature map
@@ -132,13 +135,17 @@ def draw_the_comparison(img, img_gt=[],
         ratio = 1.0
     ratio = 1.0
 
+    ############### for plot psnr per channels ######################
+    psnr_vals = np.zeros(chs)
+    #################################################################
+
     for c in range(chs):
         img_c = img[:, :, :, c]*ratio
         # set position
         idx_v = int(c / cols)
         idx_h = int(c % cols)
 
-        if img_gt != []:
+        if img_gt != []: #img_gt.shape is (1,100,100,31)
             gt_c = img_gt[:, :, :, c]
             # the position for GT
             # pos_gt_y = int(padding_row + (padding_row + h + padding_row + h) * idx_v)
@@ -165,6 +172,9 @@ def draw_the_comparison(img, img_gt=[],
         # compute PSNR
         if img_gt != [] and compute_psnr:
             psnr_val = qual.psnr_1ch(img_c, gt_c)
+            ############### for plot psnr per channels ######################
+            psnr_vals[c] = psnr_val
+            #################################################################
             psnr_text = '%.2f'%(psnr_val)
             pos_font_x = pos_gt_x + 10
             pos_font_y = pos_img_y + h + 20
@@ -182,3 +192,14 @@ def draw_the_comparison(img, img_gt=[],
     # cv2.imshow('code', img_vis)a
     #cv2.waitKey(100)
 
+    ############################# lambda vs psnr #########################
+    lambdas = np.arange (420, 730, 10).tolist()
+    #lambdas = np.arange (430, 700, 10).tolist() # for 28 chs
+    # plotting the points 
+    plt.plot(lambdas, psnr_vals, 'bo-')
+    plt.xlabel('lambda(nm)')
+    plt.ylabel('psnr')
+    plt.title('psnr of each channel')
+    plt.grid('equal')
+    plt.show()
+    ######################################################################

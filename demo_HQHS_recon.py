@@ -71,13 +71,16 @@ def demo_recon(SINGLE_CASSI=False,
     #########################################################
     mat_obj = sio.loadmat(file_name=filename_test)
     gt_hs = mat_obj['img_hs']
-    gt_hs = gt_hs.astype(np.float32) / 65535.0
+    
+    # gt_hs = gt_hs.astype(np.float32) / 65535.0 #intensity range is 0 ~ 65535
+    gt_hs = gt_hs.astype(np.float32) # for testdata and KAIST 02,21,23
 
     img_h, img_w, img_chs = gt_hs.shape
     mask_2d = modulation.generate_random_mask(h=img_h, w=img_w, scale=1.0)
 
     # generate coded image
     list_dispersion = np.arange(0, 31)
+    
     if SINGLE_CASSI:
         list_dispersion = np.floor(list_dispersion * 0.5)
         list_dispersion = list_dispersion.astype(dtype=np.int32)
@@ -107,6 +110,7 @@ def demo_recon(SINGLE_CASSI=False,
                                                 gt_hs=gt_hs,
                                                 out_filename=out_filename,
                                                 img_n_chs=31,
+                                                #img_n_chs=28,
                                                 list_shift=list_dispersion,
                                                 SINGLE_CASSI=SINGLE_CASSI,
                                                 SSCSI=SSCSI,
@@ -124,6 +128,7 @@ def demo_recon(SINGLE_CASSI=False,
                                                 filename_model=trained_model_filename,
                                                 do_summarize=True,
                                                 summary_dir=summary_dir)
+    print('----------------------------')
     print(x_recon.shape)
     print(wvls2b)
 

@@ -40,6 +40,7 @@ import numpy as np
 import cv2
 import scipy.io as sio
 from datetime import datetime
+import os
 
 import modulation
 import visualizer.drawer as vis
@@ -89,7 +90,7 @@ def recon_snapshot(img_snapshot=[],
     img_coded = np.expand_dims(img_snapshot, axis=0)
 
     if SSCSI:
-        mask3d = modulation.shift_random_mask(img_mask, shift=0.1)
+        mask3d = modulation.shift_random_mask(img_mask, chs=img_n_chs, shift=0.1)
     else:
         mask3d = modulation.generate_shifted_mask_cube(img_mask, chs=img_n_chs,
                                                        shift_list=list_shift,
@@ -234,6 +235,8 @@ def recon_snapshot(img_snapshot=[],
                             print('iter: %d, total_loss: %6e, data_loss: %6e, admm_loss: %6e,' \
                                   ' alpha_loss: %6e,' \
                                   % (i_nonlinear, l_total, l_data, l_admm, l_alpha_fidelity))
+                            with open(os.path.join(summary_dir, 'psnr.txt'), 'at') as f:
+                                f.write('%6e, ' % (l_total))
 
                         if i_nonlinear == n_iters - 1:
                             # update xk (code)
